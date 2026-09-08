@@ -1,0 +1,104 @@
+# Rendered by /entrypoint.sh at container startup via envsubst.
+# Variables: ${ORACLE_API_UPSTREAM} — e.g. http://srv-captain--oracle-api
+
+# Rate-limit zone for admin login — 5 req/min/IP, 10 MB state for IPs.
+# Declared at http scope (conf.d/*.conf is included under http{}).
+limit_req_zone $binary_remote_addr zone=oracle_login:10m rate=5r/m;
+
+server {
+    listen 80;
+    server_name _;
+
+    # Docker's embedded DNS — required for nginx to resolve srv-captain--*
+    # service names at request time inside CapRover's Swarm overlay network.
+    resolver 127.0.0.11 ipv6=off valid=10s;
+
+    access_log /dev/stdout;
+    error_log  /dev/stderr warn;
+
+    client_max_body_size 20m;
+    proxy_read_timeout    30s;
+    proxy_connect_timeout 5s;
+
+    # Admin portals should never be indexed. Header applies to every
+    # response; robots.txt below is a belt-and-braces defense.
+    add_header X-Robots-Tag "noindex, nofollow, noarchive" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" always;
+
+    # ─── robots.txt — explicit disallow ─────────────────────────────────────
+    location = /robots.txt {
+        add_header Content-Type text/plain;
+        return 200 "User-agent: *\nDisallow: /\n";
+    }
+
+    # ─── Rate-limited admin login ───────────────────────────────────────────
+    # Brute-force protection: 5 req/min/IP, burst 10 (absorbs refresh bursts
+    # without locking out a real admin). nodelay so the first 10 requests
+    # don't pile up queued — excess returns 429 immediately.
+    location = /api/auth/login {
+        limit_req  zone=oracle_login burst=10 nodelay;
+        limit_req_status 429;
+
+        proxy_pass ${ORACLE_API_UPSTREAM};
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host  $host;
+    }
+
+    # ─── Same-origin API proxy ──────────────────────────────────────────────
+    # Frontend calls /api/* on its own origin; nginx forwards to oracle-api.
+    # No CORS, cookies flow through as-is.
+    location /api/ {
+        proxy_pass ${ORACLE_API_UPSTREAM};
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host  $host;
+    }
+
+    # ─── Static assets — immutable, never fall through to index.html ────────
+    # Without this carve-out, a stale bookmark/cached tab requesting an old
+    # hashed chunk (e.g. /assets/src-abc123.js) that no longer exists after
+    # a redeploy would hit the SPA fallback below and receive index.html —
+    # the browser then fails with a "Failed to load module script: MIME type
+    # text/html" because it expected JS/WASM. Returning 404 forces the
+    # browser to reload index.html, which points at the new chunk names.
+    location /assets/ {
+        root       /usr/share/nginx/html;
+        try_files  $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        add_header X-Robots-Tag "noindex, nofollow, noarchive" always;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" always;
+    }
+
+    # ─── SPA fallback — never cache index.html itself ───────────────────────
+    # index.html must not be cached, otherwise users get stuck pointing at
+    # stale chunk hashes. Content is tiny; caching the shell saves nothing
+    # but buys a lot of "why is my site broken" support tickets.
+    location / {
+        root      /usr/share/nginx/html;
+        index     index.html;
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-store, must-revalidate" always;
+        add_header X-Robots-Tag "noindex, nofollow, noarchive" always;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" always;
+    }
+}

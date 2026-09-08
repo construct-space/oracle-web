@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@core/*": ["./src/*"],
+      "@spaces": ["../spaces"],
+      "@spaces/types": ["../spaces/types.ts"],
+      "@spaces/accounts": ["../spaces/accounts/index.ts"],
+      "@spaces/admin": ["../spaces/admin/index.ts"],
+      "@spaces/billing": ["../spaces/billing/index.ts"],
+      "@spaces/blog": ["../spaces/blog/index.ts"],
+      "@spaces/delivery": ["../spaces/delivery/index.ts"],
+      "@spaces/developer": ["../spaces/developer/index.ts"],
+      "@spaces/domains": ["../spaces/domains/index.ts"],
+      "@spaces/marketplace": ["../spaces/marketplace/index.ts"],
+      "@spaces/provider": ["../spaces/provider/index.ts"],
+      "@spaces/source": ["../spaces/source/index.ts"],
+      "@spaces/telemetry": ["../spaces/telemetry/index.ts"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "src/**/*.vue",
+    "../packages/ui-web/src/auto-imports.d.ts"
+  ]
+}

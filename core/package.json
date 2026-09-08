@@ -1,0 +1,49 @@
+{
+  "name": "@construct-space/oracle-core",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Construct Oracle admin shell core.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@construct-space/oracle-space-accounts": "workspace:*",
+    "@construct-space/oracle-space-admin": "workspace:*",
+    "@construct-space/oracle-space-billing": "workspace:*",
+    "@construct-space/oracle-space-delivery": "workspace:*",
+    "@construct-space/oracle-space-developer": "workspace:*",
+    "@construct-space/oracle-space-domains": "workspace:*",
+    "@construct-space/oracle-space-source": "workspace:*",
+    "@construct-space/oracle-space-telemetry": "workspace:*",
+    "@construct-space/ui-web": "workspace:*",
+    "@fontsource/rubik": "^5.2.8",
+    "d3-geo": "^3.1.1",
+    "d3-selection": "^3.0.0",
+    "d3-zoom": "^3.0.0",
+    "lucide-vue-next": "^1.0.0",
+    "pinia": "^3.0.4",
+    "reka-ui": "^2.9.6",
+    "topojson-client": "^3.1.0",
+    "vue": "^3.5.32",
+    "vue-router": "^5.0.4",
+    "world-atlas": "^2.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/d3-geo": "^3.1.0",
+    "@types/d3-selection": "^3.0.11",
+    "@types/d3-zoom": "^3.0.8",
+    "@types/topojson-client": "^3.1.5",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^6.0.2",
+    "unplugin-auto-import": "^21.0.0",
+    "unplugin-vue-components": "^32.0.0",
+    "vite": "^8.0.10",
+    "vue-tsc": "^3.2.6"
+  }
+}

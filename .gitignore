@@ -1,0 +1,18 @@
+node_modules
+dist
+.DS_Store
+.env
+*.log
+
+# Build outputs
+core/dist
+packages/*/dist
+spaces/*/dist
+
+# IDE
+.vscode
+.idea
+
+# Vite / auto-imports generated
+auto-imports.d.ts
+components.d.ts

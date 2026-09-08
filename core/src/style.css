@@ -1,0 +1,68 @@
+@import "@fontsource/rubik/400.css";
+@import "@fontsource/rubik/500.css";
+@import "@fontsource/rubik/600.css";
+@import "@fontsource/rubik/700.css";
+@import "@fontsource/rubik/800.css";
+@import "@fontsource/rubik/900.css";
+@import "tailwindcss";
+
+/*
+ * Tell Tailwind that Rubik is our default sans. Tailwind 4's preflight
+ * sets `--default-font-family` on html/body and utilities (`font-sans`,
+ * etc.) inherit from `--font-sans` — without overriding here, our
+ * html/body rule gets shadowed on every element that sets its own
+ * font-family through those utilities.
+ */
+@theme {
+  --font-sans: "Rubik", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  --default-font-family: var(--font-sans);
+}
+
+/*
+ * Tailwind v4 auto-detects sources from the Vite entry. Spaces and
+ * packages live in sibling workspace dirs, so add explicit @source
+ * globs to compile utility classes inside space + ui-web .vue files.
+ */
+@source "../../spaces/**/*.{vue,ts,tsx}";
+@source "../../packages/**/*.{vue,ts,tsx}";
+
+/*
+ * Only the minimal resets + page-level chrome live here. All color/tone
+ * vars come from @construct-space/ui-web's useTheme().init() which sets
+ * --app-background, --app-foreground, --app-accent, --app-border, etc.
+ * on :root. Components reference var(--app-*) directly.
+ */
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Rubik", -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+body {
+  background: var(--app-canvas-bg, #eef1f6);
+  color: var(--app-foreground, #0f172a);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+
+/* `.mono` is a pure styling shorthand — letter-spacing + uppercase
+ * look, no font-family override. Everything inherits Rubik so the
+ * portal reads as one typeface. */
+.mono {
+  letter-spacing: 0.02em;
+}
+
+code {
+  border-radius: 0.5rem;
+  background: var(--app-surface, #f8fafc);
+  padding: 0.1rem 0.4rem;
+}

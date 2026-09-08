@@ -1,0 +1,23 @@
+{
+  "name": "@construct-space/oracle",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Fresh Oracle admin console workspace. Root-level Vue SPA + shared packages for the Construct admin portal.",
+  "workspaces": [
+    "packages/ui-web",
+    "spaces/*",
+    "core"
+  ],
+  "scripts": {
+    "dev": "cd core && npm run dev",
+    "build": "cd core && npm run build",
+    "preview": "cd core && npm run preview",
+    "typecheck": "cd core && npm run typecheck",
+    "lint": "biome check core/src spaces packages/ui-web/src",
+    "lint:fix": "biome check --write core/src spaces packages/ui-web/src",
+    "format": "biome format --write core/src spaces packages/ui-web/src"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.14"
+  }
+}
